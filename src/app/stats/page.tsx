@@ -1,0 +1,195 @@
+"use client";
+
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
+import ReactApexChart from "react-apexcharts";
+import { ApexOptions } from "apexcharts";
+import { motion } from "framer-motion";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import ChatWidget from "@/components/ChatWidget";
+
+// ---------- Types ----------
+interface Coin {
+  id: string;
+  name: string;
+  symbol: string;
+  current_price: number;
+  price_change_percentage_24h: number;
+  market_cap: number;
+  total_volume: number;
+  image: string;
+}
+
+// ---------- Stats Page ----------
+const StatsPage: React.FC = () => {
+  const [coins, setCoins] = useState<Coin[]>([]);
+  const [candlestickData, setCandlestickData] = useState<{ x: Date; y: number[] }[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const fetchCoins = async () => {
+    try {
+      const res = await axios.get("https://api.coingecko.com/api/v3/coins/markets", {
+        params: {
+          vs_currency: "usd",
+          order: "market_cap_desc",
+          per_page: 20,
+          page: 1,
+          sparkline: true,
+          price_change_percentage: "24h",
+        },
+      });
+      setCoins(res.data);
+
+      const ohlcRes = await axios.get(
+        "https://api.coingecko.com/api/v3/coins/bitcoin/ohlc",
+        { params: { vs_currency: "usd", days: 1 } }
+      );
+      const formatted = ohlcRes.data.map((d: any) => ({
+        x: new Date(d[0]),
+        y: [d[1], d[2], d[3], d[4]],
+      }));
+      setCandlestickData(formatted);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCoins();
+    const interval = setInterval(fetchCoins, 60000);
+
+    const scrollInterval = setInterval(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollLeft += 1;
+        if (scrollRef.current.scrollLeft + scrollRef.current.clientWidth >= scrollRef.current.scrollWidth) {
+          scrollRef.current.scrollLeft = 0;
+        }
+      }
+    }, 20);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(scrollInterval);
+    };
+  }, []);
+
+  const candlestickOptions: ApexOptions = {
+    chart: { type: "candlestick", background: "#111827", toolbar: { show: true } },
+    title: { text: "BTC Candlestick Chart (1h)", style: { color: "#fff" }, align: "left" },
+    xaxis: { type: "datetime", labels: { style: { colors: "#fff" } } },
+    yaxis: { labels: { style: { colors: "#fff" } }, tooltip: { enabled: true } },
+    grid: { borderColor: "#333" },
+  };
+
+  const sectionVariant = { hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8 } } };
+
+  const gainers = [...coins].filter((c) => c.price_change_percentage_24h > 0).sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h).slice(0, 5);
+  const losers = [...coins].filter((c) => c.price_change_percentage_24h < 0).sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h).slice(0, 5);
+  const highestBought = [...coins].sort((a, b) => b.total_volume - a.total_volume).slice(0, 5);
+  const marketCapTop = [...coins].sort((a, b) => b.market_cap - a.market_cap).slice(0, 5);
+
+  return (
+    <div className="bg-gray-900 text-white min-h-screen relative">
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Hero */}
+      <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative h-screen flex flex-col justify-center items-center overflow-hidden bg-gray-900">
+        <div className="absolute w-[200px] h-[200px] rounded-full bg-blue-600/30 animate-ping blur-2xl"></div>
+        <div className="absolute w-[300px] h-[300px] rounded-full bg-purple-600/30 animate-ping blur-2xl"></div>
+        <div className="absolute w-[400px] h-[400px] rounded-full bg-pink-600/20 animate-ping blur-3xl"></div>
+
+        <motion.h1 initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 1 }} className="text-5xl md:text-6xl font-bold text-white z-10 text-center">
+          Real-Time Crypto Stats
+        </motion.h1>
+        <motion.p initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 1, delay: 0.5 }} className="text-lg md:text-xl text-gray-300 mt-4 text-center max-w-xl z-10">
+          Track the market live, see top movers, and make data-driven crypto decisions.
+        </motion.p>
+      </motion.section>
+
+      {/* Live Tracker */}
+      <motion.section variants={sectionVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} ref={scrollRef} className="flex gap-4 overflow-x-auto py-8 px-6 scrollbar-hide">
+        {coins.map((coin) => (
+          <div key={coin.id} className="min-w-[180px] p-4 bg-gray-800/50 backdrop-blur-md rounded-xl text-center hover:scale-105 transition-transform">
+            <img src={coin.image} alt={coin.name} className="w-10 h-10 mx-auto mb-2" />
+            <h3 className="font-semibold">{coin.symbol.toUpperCase()}</h3>
+            <p>${coin.current_price.toLocaleString()}</p>
+            <p className={coin.price_change_percentage_24h > 0 ? "text-green-400" : "text-red-400"}>
+              {coin.price_change_percentage_24h.toFixed(2)}%
+            </p>
+          </div>
+        ))}
+      </motion.section>
+
+      {/* Candlestick Chart */}
+      <motion.section variants={sectionVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="max-w-6xl mx-auto p-6 my-6 bg-gray-800/50 backdrop-blur-md rounded-xl">
+        <ReactApexChart options={candlestickOptions} series={[{ data: candlestickData }]} type="candlestick" height={400} />
+      </motion.section>
+
+      {/* Gainers & Losers */}
+      <motion.section variants={sectionVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6 p-6">
+        <div className="bg-gray-800/50 p-6 rounded-xl backdrop-blur-md hover:scale-105 transition-transform">
+          <h2 className="text-xl font-semibold text-green-400 mb-4">Top Gainers</h2>
+          <ul className="space-y-2">
+            {gainers.map((coin) => (
+              <li key={coin.id} className="flex items-center space-x-3">
+                <img src={coin.image} alt={coin.name} className="w-6 h-6" />
+                <span>{coin.name} ({coin.symbol.toUpperCase()}) - <span className="text-green-400">{coin.price_change_percentage_24h.toFixed(2)}%</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="bg-gray-800/50 p-6 rounded-xl backdrop-blur-md hover:scale-105 transition-transform">
+          <h2 className="text-xl font-semibold text-red-400 mb-4">Top Losers</h2>
+          <ul className="space-y-2">
+            {losers.map((coin) => (
+              <li key={coin.id} className="flex items-center space-x-3">
+                <img src={coin.image} alt={coin.name} className="w-6 h-6" />
+                <span>{coin.name} ({coin.symbol.toUpperCase()}) - <span className="text-red-400">{coin.price_change_percentage_24h.toFixed(2)}%</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </motion.section>
+
+      {/* Highest Bought */}
+      <motion.section variants={sectionVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="max-w-6xl mx-auto p-6 my-6 bg-gray-800/50 backdrop-blur-md rounded-xl hover:scale-105 transition-transform">
+        <h2 className="text-xl font-semibold mb-4">Highest Bought Coins</h2>
+        <ul className="space-y-2">
+          {highestBought.map((coin) => (
+            <li key={coin.id} className="flex items-center space-x-3">
+              <img src={coin.image} alt={coin.name} className="w-6 h-6" />
+              <span>{coin.name} ({coin.symbol.toUpperCase()}): ${coin.current_price.toLocaleString()}</span>
+            </li>
+          ))}
+        </ul>
+      </motion.section>
+
+      {/* Market Cap */}
+      <motion.section variants={sectionVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="max-w-6xl mx-auto p-6 my-6 bg-gray-800/50 backdrop-blur-md rounded-xl hover:scale-105 transition-transform">
+        <h2 className="text-xl font-semibold mb-4">Top Market Cap Coins</h2>
+        <ul className="space-y-2">
+          {marketCapTop.map((coin) => (
+            <li key={coin.id} className="flex justify-between items-center">
+              <div className="flex items-center space-x-3">
+                <img src={coin.image} alt={coin.name} className="w-6 h-6" />
+                <span>{coin.name} ({coin.symbol.toUpperCase()})</span>
+              </div>
+              <span>${coin.market_cap.toLocaleString()}</span>
+            </li>
+          ))}
+        </ul>
+      </motion.section>
+
+      {/* Footer */}
+      <Footer />
+
+      {/* Chat Widget */}
+      <ChatWidget />
+    </div>
+  );
+};
+
+export default StatsPage;
