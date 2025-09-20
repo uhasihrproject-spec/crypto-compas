@@ -1,10 +1,12 @@
 'use client';
 
+'use client';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { auth, db } from '@/src/firebaseConfig';
+import { auth, db } from '@/firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 interface UserData {
@@ -26,7 +28,7 @@ export default function ProfileSettings() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login');
+      forceRedirect('/login');
     }
   }, [user, loading, router]);
 
@@ -98,14 +100,14 @@ export default function ProfileSettings() {
         {/* Buttons */}
         <div className="space-y-4">
           <button
-            onClick={() => router.push('/profile')}
+            onClick={() => forceRedirect('/profile')}
             className="w-full py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 transition text-lg font-semibold"
           >
             Go Back Home
           </button>
 
           <button
-            onClick={() => router.push('/profile/withdraw/history')}
+            onClick={() => forceRedirect('/profile/withdraw/history')}
             className="w-full py-4 rounded-xl bg-purple-600 hover:bg-purple-700 transition text-lg font-semibold"
           >
             View Withdraw History

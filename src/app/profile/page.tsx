@@ -1,10 +1,12 @@
 'use client';
 
+'use client';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { auth, db } from '@/src/firebaseConfig';
+import { auth, db } from '@/firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import ChatWidget from '@/components/ChatWidget';
 
@@ -61,7 +63,7 @@ export default function ProfileHome() {
   // Redirect if not logged in
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login');
+      forceRedirect('/login');
     }
   }, [user, loading, router]);
 
@@ -175,7 +177,7 @@ export default function ProfileHome() {
         {/* Four Hero Buttons */}
 <div className="grid grid-cols-4 gap-6 mt-10 relative z-10">
   <button
-    onClick={() => router.push('/profile/invest')}
+    onClick={() => forceRedirect('/profile/invest')}
     className="flex flex-col items-center gap-2 group"
   >
     <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center 
@@ -186,7 +188,7 @@ export default function ProfileHome() {
   </button>
 
   <button
-    onClick={() => router.push('/profile/withdraw')}
+    onClick={() => forceRedirect('/profile/withdraw')}
     className="flex flex-col items-center gap-2 group"
   >
     <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center 
@@ -197,7 +199,7 @@ export default function ProfileHome() {
   </button>
 
   <button
-    onClick={() => router.push('/profile/history')}
+    onClick={() => forceRedirect('/profile/history')}
     className="flex flex-col items-center gap-2 group"
   >
     <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center 
@@ -208,7 +210,7 @@ export default function ProfileHome() {
   </button>
 
   <button
-    onClick={() => router.push('/profile/portfolio')}
+    onClick={() => forceRedirect('/profile/portfolio')}
     className="flex flex-col items-center gap-2 group"
   >
     <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-500 to-pink-700 flex items-center justify-center 
@@ -232,7 +234,7 @@ export default function ProfileHome() {
               key={w.coin}
               whileHover={{ scale: 1.02 }}
               className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10"
-              onClick={() => router.push(`/profile/invest?coin=${w.coin}`)}
+              onClick={() => forceRedirect(`/profile/invest?coin=${w.coin}`)}
             >
               <div className="flex items-center gap-3 min-w-0">
                 {w.image && (
@@ -266,7 +268,7 @@ export default function ProfileHome() {
       <div className="fixed bottom-0 left-0 w-full bg-slate-900/80 backdrop-blur-md border-t border-white/10">
         <div className="max-w-2xl mx-auto flex justify-between items-center px-10 py-3 relative">
           <button
-            onClick={() => router.push('/profile/history')}
+            onClick={() => forceRedirect('/profile/history')}
             className="flex flex-col items-center text-xs text-white/70 hover:text-indigo-400 transition"
           >
             <History className="w-5 h-5" />
@@ -275,7 +277,7 @@ export default function ProfileHome() {
 
           {/* Floating Home */}
           <button
-            onClick={() => router.push('/profile')}
+            onClick={() => forceRedirect('/profile')}
             className="absolute left-1/2 -translate-x-1/2 -top-7 w-14 h-14 rounded-full bg-indigo-600 flex flex-col items-center justify-center text-xs shadow-lg hover:scale-110 transition"
           >
             <Home className="w-6 h-6" />
@@ -283,7 +285,7 @@ export default function ProfileHome() {
           </button>
 
           <button
-            onClick={() => router.push('/profile/settings')}
+            onClick={() => forceRedirect('/profile/settings')}
             className="flex flex-col items-center text-xs text-white/70 hover:text-indigo-400 transition"
           >
             <User className="w-5 h-5" />

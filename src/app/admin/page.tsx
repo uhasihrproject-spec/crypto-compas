@@ -1,3 +1,5 @@
+'use client';
+
 "use client";
 
 /**
@@ -8,7 +10,7 @@
  */
 
 import React, { useEffect, useState, useRef } from "react";
-import { auth, db } from "@/src/firebaseConfig";
+import { auth, db } from "@/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, query, where, getDocs, onSnapshot, orderBy, addDoc, serverTimestamp, deleteDoc, doc } from "firebase/firestore";
 import { motion } from "framer-motion";

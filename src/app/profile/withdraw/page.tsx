@@ -1,9 +1,11 @@
 'use client';
 
+'use client';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { auth, db } from '@/src/firebaseConfig';
+import { auth, db } from '@/firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { collection, query, where, onSnapshot, updateDoc, doc } from 'firebase/firestore';
 
@@ -24,7 +26,7 @@ export default function WithdrawPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login');
+      forceRedirect('/login');
     }
   }, [user, loading, router]);
 
@@ -130,7 +132,7 @@ export default function WithdrawPage() {
         </button>
         <h2 className="font-semibold text-lg">Withdraw</h2>
         <button
-          onClick={() => router.push('/profile/withdraw/history')}
+          onClick={() => forceRedirect('/profile/withdraw/history')}
           className="text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded-lg transition"
         >
           History

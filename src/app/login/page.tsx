@@ -1,9 +1,11 @@
+'use client';
+
 "use client";
 
 import Link from "next/link";
 import { useState, FormEvent, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { auth, googleProvider } from "@/src/firebaseConfig";
+import { auth, googleProvider } from "@/firebaseConfig";
 import { signInWithEmailAndPassword, signInWithPopup, User } from "firebase/auth";
 
 export default function LoginPage() {
@@ -26,8 +28,8 @@ export default function LoginPage() {
     const colors = ["rgba(255,255,255,0.15)", "rgba(255,255,255,0.2)", "rgba(255,255,255,0.25)"];
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.width = typeof window !== "undefined" && window.innerWidth;
+      canvas.height = typeof window !== "undefined" && window.innerHeight;
       circles = [];
       for (let i = 0; i < numCircles; i++) {
         const radius = Math.random() * 50 + 30;
@@ -61,10 +63,10 @@ export default function LoginPage() {
       requestAnimationFrame(animate);
     };
 
-    window.addEventListener("resize", resize);
+    typeof window !== "undefined" && window.addEventListener("resize", resize);
     resize();
     animate();
-    return () => window.removeEventListener("resize", resize);
+    return () => typeof window !== "undefined" && window.removeEventListener("resize", resize);
   }, []);
 
   // --- Firebase login ---
@@ -76,7 +78,7 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user: User = userCredential.user;
       console.log("Logged in:", user.email);
-      router.push("/"); // redirect to homepage
+      forceRedirect("/"); // redirect to homepage
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -89,7 +91,7 @@ export default function LoginPage() {
       const result = await signInWithPopup(auth, googleProvider);
       const user: User = result.user;
       console.log("Google login success:", user.email);
-      router.push("/"); // redirect to homepage
+      forceRedirect("/"); // redirect to homepage
     } catch (err: any) {
       setError(err.message);
     }

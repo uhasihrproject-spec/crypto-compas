@@ -1,9 +1,11 @@
 'use client';
 
+'use client';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { auth, db } from '@/src/firebaseConfig';
+import { auth, db } from '@/firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 
@@ -21,7 +23,7 @@ export default function WithdrawHistoryPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login');
+      forceRedirect('/login');
     }
   }, [user, loading, router]);
 

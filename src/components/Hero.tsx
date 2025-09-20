@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/src/firebaseConfig";
+import { auth } from "@/firebaseConfig";
+import { useRouter } from "next/navigation";
 
 // Extended slides with gradients & text
 const slides = [
@@ -37,6 +38,7 @@ const slides = [
 export default function Hero() {
   const [user, setUser] = useState<any>(null);
   const [index, setIndex] = useState(0);
+  const router = useRouter();
 
   // Track auth state
   useEffect(() => {
@@ -124,7 +126,7 @@ export default function Hero() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-black rounded-lg font-semibold shadow-lg hover:bg-gray-200 transition"
-              onClick={() => (window.location.href = "/get-started")}
+              onClick={() => forceRedirect("/get-started")}
             >
               Get Started
             </motion.button>
@@ -134,6 +136,7 @@ export default function Hero() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               className="px-6 py-3 border border-gray-300 bg-transparent rounded-lg font-semibold text-white shadow-lg hover:bg-white/20 transition"
+              onClick={() => forceRedirect("/learn-more")}
             >
               Learn More
             </motion.button>
@@ -193,13 +196,9 @@ export default function Hero() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-black rounded-lg font-semibold shadow-lg hover:bg-gray-200 transition"
-            onClick={() => {
-              if (isAdmin) {
-                window.location.href = "/admin-console";
-              } else {
-                window.location.href = "/profile";
-              }
-            }}
+            onClick={() =>
+              isAdmin ? forceRedirect("/admin-console") : forceRedirect("/profile")
+            }
           >
             {isAdmin ? "Go to Admin Console" : "View Your Profile"}
           </motion.button>

@@ -1,3 +1,5 @@
+'use client';
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -62,8 +64,8 @@ function HeroCanvas() {
     let raf = 0;
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.width = typeof window !== "undefined" && window.innerWidth;
+      canvas.height = typeof window !== "undefined" && window.innerHeight;
       circles = [];
       for (let i = 0; i < numCircles; i++) {
         const r = Math.random() * 60 + 20;
@@ -97,11 +99,11 @@ function HeroCanvas() {
       raf = requestAnimationFrame(animate);
     };
 
-    window.addEventListener("resize", resize);
+    typeof window !== "undefined" && window.addEventListener("resize", resize);
     resize();
     animate();
     return () => {
-      window.removeEventListener("resize", resize);
+      typeof window !== "undefined" && window.removeEventListener("resize", resize);
       cancelAnimationFrame(raf);
     };
   }, []);

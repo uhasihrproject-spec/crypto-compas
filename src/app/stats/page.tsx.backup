@@ -1,16 +1,13 @@
-'use client';
+"use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import dynamic from "next/dynamic";
 import axios from "axios";
+import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
-
-// ---------- Dynamically import ApexCharts (SSR-safe) ----------
-const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 // ---------- Types ----------
 interface Coin {
@@ -49,7 +46,6 @@ const StatsPage: React.FC = () => {
         "https://api.coingecko.com/api/v3/coins/bitcoin/ohlc",
         { params: { vs_currency: "usd", days: 1 } }
       );
-
       const formatted = ohlcRes.data.map((d: any) => ({
         x: new Date(d[0]),
         y: [d[1], d[2], d[3], d[4]],
@@ -66,14 +62,19 @@ const StatsPage: React.FC = () => {
     const fetchInterval = setInterval(fetchCoins, 60000);
 
     let animationFrameId: number;
+
     const scrollTicker = () => {
       if (scrollRef.current) {
         scrollRef.current.scrollLeft += 1;
-        const scrollWidth = scrollRef.current.scrollWidth / 2;
-        if (scrollRef.current.scrollLeft >= scrollWidth) scrollRef.current.scrollLeft = 0;
+        // Smooth infinite loop by duplicating content if needed
+        const scrollWidth = scrollRef.current.scrollWidth / 2; // assuming duplicated content
+        if (scrollRef.current.scrollLeft >= scrollWidth) {
+          scrollRef.current.scrollLeft = 0;
+        }
       }
       animationFrameId = requestAnimationFrame(scrollTicker);
     };
+
     scrollTicker();
 
     return () => {
@@ -94,14 +95,8 @@ const StatsPage: React.FC = () => {
   const sectionVariant = { hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8 } } };
 
   // ---------- Derived Coin Lists ----------
-  const gainers = [...coins].filter(c => c.price_change_percentage_24h > 0)
-    .sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h)
-    .slice(0, 5);
-
-  const losers = [...coins].filter(c => c.price_change_percentage_24h < 0)
-    .sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h)
-    .slice(0, 5);
-
+  const gainers = [...coins].filter((c) => c.price_change_percentage_24h > 0).sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h).slice(0, 5);
+  const losers = [...coins].filter((c) => c.price_change_percentage_24h < 0).sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h).slice(0, 5);
   const highestBought = [...coins].sort((a, b) => b.total_volume - a.total_volume).slice(0, 5);
   const marketCapTop = [...coins].sort((a, b) => b.market_cap - a.market_cap).slice(0, 5);
 
@@ -122,7 +117,7 @@ const StatsPage: React.FC = () => {
         </motion.p>
       </motion.section>
 
-      {/* Scrolling Ticker */}
+      {/* Smooth Infinite Scrolling Ticker */}
       <motion.section variants={sectionVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="overflow-hidden py-8 px-6">
         <div ref={scrollRef} className="flex gap-4 whitespace-nowrap">
           {[...coins, ...coins].map((coin, index) => (
@@ -148,7 +143,7 @@ const StatsPage: React.FC = () => {
         <div className="bg-gray-800/50 p-6 rounded-xl backdrop-blur-md hover:scale-105 transition-transform">
           <h2 className="text-xl font-semibold text-green-400 mb-4">Top Gainers</h2>
           <ul className="space-y-2">
-            {gainers.map(coin => (
+            {gainers.map((coin) => (
               <li key={coin.id} className="flex items-center space-x-3">
                 <img src={coin.image} alt={coin.name} className="w-6 h-6" />
                 <span>{coin.name} ({coin.symbol.toUpperCase()}) - <span className="text-green-400">{coin.price_change_percentage_24h.toFixed(2)}%</span></span>
@@ -160,7 +155,7 @@ const StatsPage: React.FC = () => {
         <div className="bg-gray-800/50 p-6 rounded-xl backdrop-blur-md hover:scale-105 transition-transform">
           <h2 className="text-xl font-semibold text-red-400 mb-4">Top Losers</h2>
           <ul className="space-y-2">
-            {losers.map(coin => (
+            {losers.map((coin) => (
               <li key={coin.id} className="flex items-center space-x-3">
                 <img src={coin.image} alt={coin.name} className="w-6 h-6" />
                 <span>{coin.name} ({coin.symbol.toUpperCase()}) - <span className="text-red-400">{coin.price_change_percentage_24h.toFixed(2)}%</span></span>
@@ -174,7 +169,7 @@ const StatsPage: React.FC = () => {
       <motion.section variants={sectionVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="max-w-6xl mx-auto p-6 my-6 bg-gray-800/50 backdrop-blur-md rounded-xl hover:scale-105 transition-transform">
         <h2 className="text-xl font-semibold mb-4">Highest Bought Coins</h2>
         <ul className="space-y-2">
-          {highestBought.map(coin => (
+          {highestBought.map((coin) => (
             <li key={coin.id} className="flex items-center space-x-3">
               <img src={coin.image} alt={coin.name} className="w-6 h-6" />
               <span>{coin.name} ({coin.symbol.toUpperCase()}): ${coin.current_price.toLocaleString()}</span>
@@ -187,7 +182,7 @@ const StatsPage: React.FC = () => {
       <motion.section variants={sectionVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="max-w-6xl mx-auto p-6 my-6 bg-gray-800/50 backdrop-blur-md rounded-xl hover:scale-105 transition-transform">
         <h2 className="text-xl font-semibold mb-4">Top Market Cap Coins</h2>
         <ul className="space-y-2">
-          {marketCapTop.map(coin => (
+          {marketCapTop.map((coin) => (
             <li key={coin.id} className="flex justify-between items-center">
               <div className="flex items-center space-x-3">
                 <img src={coin.image} alt={coin.name} className="w-6 h-6" />

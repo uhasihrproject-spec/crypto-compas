@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { auth } from "@/src/firebaseConfig";
+import { auth } from "@/firebaseConfig";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -35,8 +35,8 @@ export default function Navbar() {
         setDropdownOpen(false);
       }
     };
-    window.addEventListener("click", handleClickOutside);
-    return () => window.removeEventListener("click", handleClickOutside);
+    typeof window !== "undefined" && window.addEventListener("click", handleClickOutside);
+    return () => typeof window !== "undefined" && window.removeEventListener("click", handleClickOutside);
   }, []);
 
   const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (

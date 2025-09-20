@@ -1,10 +1,12 @@
 'use client';
 
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import CountUp from 'react-countup';
-import { auth, db } from '@/src/firebaseConfig';
+import { auth, db } from '@/firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import {
   collection,
@@ -68,7 +70,7 @@ export default function AdminConsole() {
   // Admin check & redirect non-admins
   useEffect(() => {
     if (!loading && user && user.email !== 'olivegray022@gmail.com') {
-      router.push('/');
+      forceRedirect('/');
     }
   }, [user, loading, router]);
 

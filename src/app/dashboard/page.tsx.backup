@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 
 "use client";
 
@@ -278,7 +276,7 @@ export default function DashboardPage() {
   // Persist accounts to localStorage (load on mount)
   useEffect(() => {
     try {
-      const saved = typeof window !== "undefined" ? localStorage.getItem("accounts") : null;
+      const saved = localStorage.getItem("accounts");
       if (saved) {
         const parsed = JSON.parse(saved) as BlockchainAccount[];
         // basic validation
@@ -291,7 +289,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     try {
-      typeof window !== "undefined" && localStorage.setItem("accounts", JSON.stringify(accounts));
+      localStorage.setItem("accounts", JSON.stringify(accounts));
     } catch (e) {
       console.warn("Failed to save accounts to localStorage", e);
     }

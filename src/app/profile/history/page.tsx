@@ -1,5 +1,7 @@
 'use client';
 
+'use client';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -10,7 +12,7 @@ import {
   orderBy,
   onSnapshot
 } from 'firebase/firestore';
-import { auth, db } from '@/src/firebaseConfig';
+import { auth, db } from '@/firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 interface Transaction {
@@ -30,7 +32,7 @@ export default function HistoryPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login');
+      forceRedirect('/login');
     }
   }, [user, loading, router]);
 

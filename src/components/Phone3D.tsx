@@ -67,13 +67,13 @@ export default function PhoneHero() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 640) setBaseScale(0.5);
-      else if (window.innerWidth < 1024) setBaseScale(0.8);
+      if (typeof window !== "undefined" && window.innerWidth < 640) setBaseScale(0.5);
+      else if (typeof window !== "undefined" && window.innerWidth < 1024) setBaseScale(0.8);
       else setBaseScale(1.2);
     };
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    typeof window !== "undefined" && window.addEventListener("resize", handleResize);
+    return () => typeof window !== "undefined" && window.removeEventListener("resize", handleResize);
   }, []);
 
   return (

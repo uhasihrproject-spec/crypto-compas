@@ -2,12 +2,9 @@
 
 'use client';
 
-'use client';
-
 export const dynamic = "force-dynamic";
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   addDoc,
@@ -61,7 +58,7 @@ const fmtCoin = (v?: number, d = 6) =>
 /**
  * Invest page
  */
-function InvestPageContent() {
+export default function InvestPage() {
   // auth + routing
   const [user] = useAuthState(auth);
   const router = useRouter();
@@ -551,14 +548,5 @@ function InvestPageContent() {
         )}
       </AnimatePresence>
     </div>
-  );
-}
-
-
-export default function InvestPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <InvestPageContent />
-    </Suspense>
   );
 }

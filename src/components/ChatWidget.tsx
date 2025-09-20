@@ -26,7 +26,7 @@ import {
   User as UserIcon,
   Circle,
 } from "lucide-react";
-import { auth, db } from "@/src/firebaseConfig";
+import { auth, db } from "@/firebaseConfig";
 import {
   onAuthStateChanged,
   signInWithPopup,
@@ -318,8 +318,8 @@ export default function ChatWidget() {
         // ignore
       }
     };
-    window.addEventListener("beforeunload", onUnload);
-    return () => window.removeEventListener("beforeunload", onUnload);
+    typeof window !== "undefined" && window.addEventListener("beforeunload", onUnload);
+    return () => typeof window !== "undefined" && window.removeEventListener("beforeunload", onUnload);
   }, [user]);
 
   // --- derived adminTypingActive for end-user view (if admin typing doc true) ---

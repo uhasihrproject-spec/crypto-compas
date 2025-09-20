@@ -1,3 +1,5 @@
+'use client';
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -91,8 +93,8 @@ export default function FAQPage() {
     const numCircles = 30;
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.width = typeof window !== "undefined" && window.innerWidth;
+      canvas.height = typeof window !== "undefined" && window.innerHeight;
       circles = [];
       for (let i = 0; i < numCircles; i++) {
         const r = Math.random() * 40 + 10;
@@ -126,10 +128,10 @@ export default function FAQPage() {
       requestAnimationFrame(animate);
     };
 
-    window.addEventListener("resize", resize);
+    typeof window !== "undefined" && window.addEventListener("resize", resize);
     resize();
     animate();
-    return () => window.removeEventListener("resize", resize);
+    return () => typeof window !== "undefined" && window.removeEventListener("resize", resize);
   }, []);
 
   // 🔹 Filter FAQs

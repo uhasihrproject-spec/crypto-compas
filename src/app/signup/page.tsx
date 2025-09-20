@@ -1,9 +1,11 @@
+'use client';
+
 "use client";
 
 import Link from "next/link";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { auth, googleProvider, db } from "@/src/firebaseConfig";
+import { auth, googleProvider, db } from "@/firebaseConfig";
 import {
   createUserWithEmailAndPassword,
   signInWithPopup,
@@ -51,7 +53,7 @@ export default function SignupPage() {
       });
 
       console.log("Signed up:", user.email);
-      router.push("/dashboard");
+      forceRedirect("/dashboard");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -78,7 +80,7 @@ export default function SignupPage() {
       });
 
       console.log("Google signup success:", user.email);
-      router.push("/");
+      forceRedirect("/");
     } catch (err: any) {
       setError(err.message);
     }

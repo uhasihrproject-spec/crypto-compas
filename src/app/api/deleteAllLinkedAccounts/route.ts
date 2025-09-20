@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/src/firebaseConfig";
+import { db } from "@/firebaseConfig";
 import { collection, getDocs, query, where, deleteDoc, doc } from "firebase/firestore";
 
 export async function DELETE(req: Request) {
